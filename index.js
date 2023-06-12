@@ -214,9 +214,9 @@ app.post('/payment/callback', async (req, res) => {
 });
 
 //create a route that returns a string
-app.get('/name'){
+app.post('/name', async (req, res) => {
   res.send('Hello World')
-}
+});
 
 
 const port = process.env.PORT || 3000;
