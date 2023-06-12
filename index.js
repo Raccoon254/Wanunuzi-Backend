@@ -30,59 +30,59 @@ let transporter = nodemailer.createTransport({
 });
 
 app.post('/signup', async (req, res) => {
-    try {
-      const hashedPassword = await bcrypt.hash(req.body.password, 10);
-      // Verify that the email is not already in use
-      const emailExists = await User.findOne({ where: { email: req.body.email } });
-      if (emailExists) {
-        return res.status(500).json({ message: 'Email already in use' });
-      }
-      // Verify that the phone number is not already in use
-      const phoneNumberExists = await User.findOne({ where: { phoneNumber: req.body.phoneNumber } });
-      if (phoneNumberExists) {
-        return res.status(500).json({ message: 'Phone number already in use' });
-      }
-      // Verify that the ID number is not already in use
-      const idNumberExists = await User.findOne({ where: { idNumber: req.body.idNumber } });
-      if (idNumberExists) {
-        return res.status(500).json({ message: 'ID number already in use' });
-      }
-
-      // generate a random token for email verification
-      const buffer = crypto.randomBytes(20);
-      const token = buffer.toString('hex');
-
-      const user = await User.create({
-        fullName: req.body.fullName,
-        email: req.body.email,
-        phoneNumber: req.body.phoneNumber,
-        idNumber: req.body.idNumber,
-        password: hashedPassword,
-        emailVerificationToken: token,  // store the token in the user model
-        emailVerified: false,  // flag to check if the email is verified
-        accountActivated: false // flag to check if the account is activated
-      });
-
-      // send an email with the verification token
-      const mailOptions = {
-        from: '"My App" <myapp@example.com>', // sender address
-        to: req.body.email, // receiver address
-        subject: 'Email Verification', // Subject line
-        text: `Please verify your email by using the following token: ${token}`, // plain text body
-      };
-
-      await transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-          console.error(error);
-          res.status(500).json({message: 'Error sending verification email'});
-        } else {
-          res.status(201).json({message: 'User created successfully. Verification email sent.'});
-        }
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error creating user' });
+  try {
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    // Verify that the email is not already in use
+    const emailExists = await User.findOne({ where: { email: req.body.email } });
+    if (emailExists) {
+      return res.status(500).json({ message: 'Email already in use' });
     }
+    // Verify that the phone number is not already in use
+    const phoneNumberExists = await User.findOne({ where: { phoneNumber: req.body.phoneNumber } });
+    if (phoneNumberExists) {
+      return res.status(500).json({ message: 'Phone number already in use' });
+    }
+    // Verify that the ID number is not already in use
+    const idNumberExists = await User.findOne({ where: { idNumber: req.body.idNumber } });
+    if (idNumberExists) {
+      return res.status(500).json({ message: 'ID number already in use' });
+    }
+
+    // generate a random token for email verification
+    const buffer = crypto.randomBytes(20);
+    const token = buffer.toString('hex');
+
+    const user = await User.create({
+      fullName: req.body.fullName,
+      email: req.body.email,
+      phoneNumber: req.body.phoneNumber,
+      idNumber: req.body.idNumber,
+      password: hashedPassword,
+      emailVerificationToken: token,  // store the token in the user model
+      emailVerified: false,  // flag to check if the email is verified
+      accountActivated: false // flag to check if the account is activated
+    });
+
+    // send an email with the verification token
+    const mailOptions = {
+      from: '"My App" <myapp@example.com>', // sender address
+      to: req.body.email, // receiver address
+      subject: 'Email Verification', // Subject line
+      text: `Please verify your email by using the following token: ${token}`, // plain text body
+    };
+
+    await transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error sending verification email' });
+      } else {
+        res.status(201).json({ message: 'User created successfully. Verification email sent.' });
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error creating user' });
+  }
 });
 
 
@@ -150,13 +150,13 @@ app.post('/login', async (req, res) => {
       res.json({ message: 'Logged in successfully', token });
     } else {
       res.status(401).json({ message: 'Invalid username or password' });
-    } 
+    }
   }
-    catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error logging in' });
-    }    
-  });
+  catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error logging in' });
+  }
+});
 
 
 // Handle the payment initiation route
@@ -213,9 +213,14 @@ app.post('/payment/callback', async (req, res) => {
   res.status(200).end();
 });
 
+//create a route that returns a string
+app.get('/name'){
+  res.send('Hello World')
+}
+
 
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
